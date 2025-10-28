@@ -3,55 +3,50 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Flame Mini App 🔥</title>
+  <title>Flame Mini App</title>
   <script src="https://unpkg.com/@farcaster/miniapp-sdk@latest"></script>
 
-  <!-- Open Graph Tags（讓預覽卡片顯示） -->
-  <meta property="og:title" content="Flame Mini App 🔥" />
-  <meta property="og:description" content="點我登入 Farcaster，然後發一則 Cast！手機開發，30秒上線！" />
+  <!-- 必須的 Open Graph -->
+  <meta property="og:title" content="Flame Mini App" />
+  <meta property="og:description" content="手機開發的 Farcaster Mini App，點我登入 + 發 Cast！" />
   <meta property="og:image" content="https://picsum.photos/1200/630?random=flame" />
   <meta property="og:url" content="https://farcaster-miniapp-flame.vercel.app" />
   <meta property="og:type" content="website" />
 
-  <!-- 關鍵：Farcaster Frame 標籤（解決 No embed found） -->
+  <!-- 關鍵：Farcaster Frame 標籤 -->
   <meta property="fc:frame" content="vNext" />
   <meta property="fc:frame:image" content="https://picsum.photos/1200/630?random=flame" />
   <meta property="fc:frame:button:1" content="登入 Farcaster" />
   <meta property="fc:frame:button:1:action" content="post" />
-  <meta property="fc:frame:button:1:target" content="https://farcaster-miniapp-flame.vercel.app/login" />
 </head>
 <body style="margin:0; padding:20px; font-family:system-ui; background:linear-gradient(135deg,#ff6b6b,#ffa500); min-height:100vh; text-align:center;">
   <div style="max-width:400px; margin:auto; background:white; border-radius:20px; padding:30px; box-shadow:0 10px 30px rgba(0,0,0,0.1);">
-    <h1 style="color:#c41e3a; margin-bottom:20px;">Flame Mini App 🔥</h1>
+    <h1 style="color:#c41e3a;">Flame Mini App</h1>
     <div id="login">
-      <button onclick="login()" style="width:100%; padding:16px; font-size:18px; background:#e63946; color:white; border:none; border-radius:12px; cursor:pointer; font-weight:bold;">
-        🔐 登入 Farcaster
+      <button onclick="login()" style="width:100%; padding:16px; background:#e63946; color:white; border:none; border-radius:12px; font-weight:bold;">
+        登入
       </button>
     </div>
     <div id="profile" style="display:none;">
-      <p style="font-size:18px; margin:20px 0;">歡迎，<strong id="name" style="color:#e63946;"></strong>！</p>
-      <button onclick="cast()" style="width:100%; padding:14px; background:#2a9d8f; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">
-        📢 發一則 Cast
+      <p>歡迎，<strong id="name"></strong>！</p>
+      <button onclick="cast()" style="width:100%; padding:14px; background:#2a9d8f; color:white; border:none; border-radius:10px; font-weight:bold;">
+        發 Cast
       </button>
     </div>
   </div>
 
   <script>
     async function login() {
-      try {
-        const { user } = await window.farcaster.signIn();
-        if (user) {
-          document.getElementById('login').style.display = 'none';
-          document.getElementById('profile').style.display = 'block';
-          document.getElementById('name').textContent = user.displayName || `FID:${user.fid}`;
-        }
-      } catch (e) { alert('登入失敗：' + e.message); }
+      const { user } = await window.farcaster.signIn();
+      if (user) {
+        document.getElementById('login').style.display = 'none';
+        document.getElementById('profile').style.display = 'block';
+        document.getElementById('name').textContent = user.displayName;
+      }
     }
     async function cast() {
-      try {
-        await window.farcaster.cast("Flame Mini App 成功上線！我在手機上開發的 Farcaster 工具 🔥\n#Farcaster #MiniApp");
-        alert("Cast 已發送！");
-      } catch (e) { alert('發送失敗：' + e.message); }
+      await window.farcaster.cast("Flame Mini App 上線！手機開發超簡單！");
+      alert("Cast 已發送！");
     }
   </script>
 </body>
