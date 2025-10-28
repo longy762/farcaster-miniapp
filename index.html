@@ -3,50 +3,74 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Flame Mini App</title>
+  <title>貓狗投票器</title>
   <script src="https://unpkg.com/@farcaster/miniapp-sdk@latest"></script>
 
-  <!-- 必須的 Open Graph -->
-  <meta property="og:title" content="Flame Mini App" />
-  <meta property="og:description" content="手機開發的 Farcaster Mini App，點我登入 + 發 Cast！" />
+  <!-- Open Graph -->
+  <meta property="og:title" content="貓狗大戰！快來投票！" />
+  <meta property="og:description" content="投一票給貓還是狗？結果即時更新，還會自動發 Cast！" />
   <meta property="og:image" content="https://i.imgur.com/8K9vL2m.png" />
   <meta property="og:url" content="https://farcaster-miniapp-flame.vercel.app" />
   <meta property="og:type" content="website" />
 
-  <!-- 關鍵：Farcaster Frame 標籤 -->
+  <!-- Farcaster Frame -->
   <meta property="fc:frame" content="vNext" />
   <meta property="fc:frame:image" content="https://i.imgur.com/8K9vL2m.png" />
-  <meta property="fc:frame:button:1" content="登入 Farcaster" />
+  <meta property="fc:frame:button:1" content="投貓" />
   <meta property="fc:frame:button:1:action" content="post" />
+  <meta property="fc:frame:button:2" content="投狗" />
+  <meta property="fc:frame:button:2:action" content="post" />
 </head>
-<body style="margin:0; padding:20px; font-family:system-ui; background:linear-gradient(135deg,#ff6b6b,#ffa500); min-height:100vh; text-align:center;">
+<body style="margin:0; padding:20px; font-family:system-ui; background:linear-gradient(135deg,#a78bfa,#f472b6); min-height:100vh; text-align:center;">
   <div style="max-width:400px; margin:auto; background:white; border-radius:20px; padding:30px; box-shadow:0 10px 30px rgba(0,0,0,0.1);">
-    <h1 style="color:#c41e3a;">Flame Mini App</h1>
-    <div id="login">
-      <button onclick="login()" style="width:100%; padding:16px; background:#e63946; color:white; border:none; border-radius:12px; font-weight:bold;">
-        登入
-      </button>
+    <h1 style="color:#7c3aed; margin-bottom:20px;">貓 vs 狗</h1>
+    
+    <!-- 票數顯示 -->
+    <div style="margin:20px 0; font-size:18px; font-weight:bold;">
+      貓票：<span id="catVotes" style="color:#10b981;">0</span>　|　
+      狗票：<span id="dogVotes" style="color:#ef4444;">0</span>
     </div>
-    <div id="profile" style="display:none;">
-      <p>歡迎，<strong id="name"></strong>！</p>
-      <button onclick="cast()" style="width:100%; padding:14px; background:#2a9d8f; color:white; border:none; border-radius:10px; font-weight:bold;">
-        發 Cast
+
+    <!-- 投票按鈕 -->
+    <div>
+      <button onclick="vote('cat')" style="margin:8px; padding:16px 24px; background:#10b981; color:white; border:none; border-radius:12px; font-size:18px; font-weight:bold; cursor:pointer;">
+        投貓
+      </button>
+      <button onclick="vote('dog')" style="margin:8px; padding:16px 24px; background:#ef4444; color:white; border:none; border-radius:12px; font-size:18px; font-weight:bold; cursor:pointer;">
+        投狗
       </button>
     </div>
   </div>
 
   <script>
-    async function login() {
-      const { user } = await window.farcaster.signIn();
-      if (user) {
-        document.getElementById('login').style.display = 'none';
-        document.getElementById('profile').style.display = 'block';
-        document.getElementById('name').textContent = user.displayName;
+    // 初始票數（可改成從後端讀取）
+    let catVotes = 0;
+    let dogVotes = 0;
+
+    async function vote(choice) {
+      try {
+        // 自動登入
+        const { user } = await window.farcaster.signIn();
+        if (!user) return alert("登入失敗");
+
+        // 更新票數
+        if (choice === 'cat') catVotes++;
+        else dogVotes++;
+
+        // 更新畫面
+        document.getElementById('catVotes').textContent = catVotes;
+        document.getElementById('dogVotes').textContent = dogVotes;
+
+        // 發 Cast
+        const emoji = choice === 'cat' ? '貓' : '狗';
+        await window.farcaster.cast(
+          `${user.displayName} 投了${emoji}！\n目前 ${catVotes} vs ${dogVotes}\n#貓狗大戰`
+        );
+
+        alert(`已投${emoji}！結果已發 Cast！`);
+      } catch (e) {
+        alert("投票失敗：" + e.message);
       }
-    }
-    async function cast() {
-      await window.farcaster.cast("Flame Mini App 上線！手機開發超簡單！");
-      alert("Cast 已發送！");
     }
   </script>
 </body>
