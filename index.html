@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>貓狗投票器</title>
+  <title>Cat vs Dog – Vote & Cast</title>
   <script src="https://unpkg.com/@farcaster/miniapp-sdk@latest"></script>
 
   <!-- Open Graph -->
-  <meta property="og:title" content="貓狗大戰！快來投票！" />
-  <meta property="og:description" content="投一票給貓還是狗？結果即時更新，還會自動發 Cast！" />
+  <meta property="og:title" content="Cat vs Dog – Vote & Cast!" />
+  <meta property="og:description" content="Vote 3 times and your vote will be posted automatically!" />
   <meta property="og:image" content="https://i.imgur.com/8K9vL2m.png" />
   <meta property="og:url" content="https://farcaster-miniapp-flame.vercel.app" />
   <meta property="og:type" content="website" />
@@ -16,60 +16,61 @@
   <!-- Farcaster Frame -->
   <meta property="fc:frame" content="vNext" />
   <meta property="fc:frame:image" content="https://i.imgur.com/8K9vL2m.png" />
-  <meta property="fc:frame:button:1" content="投貓" />
+  <meta property="fc:frame:button:1" content="Vote Cat" />
   <meta property="fc:frame:button:1:action" content="post" />
-  <meta property="fc:frame:button:2" content="投狗" />
+  <meta property="fc:frame:button:2" content="Vote Dog" />
   <meta property="fc:frame:button:2:action" content="post" />
 </head>
-<body style="margin:0; padding:20px; font-family:system-ui; background:linear-gradient(135deg,#a78bfa,#f472b6); min-height:100vh; text-align:center;">
-  <div style="max-width:400px; margin:auto; background:white; border-radius:20px; padding:30px; box-shadow:0 10px 30px rgba(0,0,0,0.1);">
-    <h1 style="color:#7c3aed; margin-bottom:20px;">貓 vs 狗</h1>
-    
-    <!-- 票數顯示 -->
-    <div style="margin:20px 0; font-size:18px; font-weight:bold;">
-      貓票：<span id="catVotes" style="color:#10b981;">0</span>　|　
-      狗票：<span id="dogVotes" style="color:#ef4444;">0</span>
+
+<body style="margin:0;padding:20px;font-family:system-ui;background:linear-gradient(135deg,#a78bfa,#f472b6);min-height:100vh;text-align:center;">
+  <div style="max-width:400px;margin:auto;background:white;border-radius:20px;padding:30px;box-shadow:0 10px 30px rgba(0,0,0,0.1);">
+    <h1 style="color:#7c3aed;margin-bottom:20px;">Cat vs Dog Battle</h1>
+
+    <!-- Vote counter -->
+    <div style="margin:20px 0;font-size:18px;font-weight:bold;">
+      Total Votes: <span id="totalVotes" style="color:#10b981;">0</span> / 3
     </div>
 
-    <!-- 投票按鈕 -->
+    <!-- Voting buttons -->
     <div>
-      <button onclick="vote('cat')" style="margin:8px; padding:16px 24px; background:#10b981; color:white; border:none; border-radius:12px; font-size:18px; font-weight:bold; cursor:pointer;">
-        投貓
+      <button onclick="vote('cat')" style="margin:8px;padding:16px 24px;background:#10b981;color:white;border:none;border-radius:12px;font-size:18px;font-weight:bold;cursor:pointer;">
+        Vote Cat
       </button>
-      <button onclick="vote('dog')" style="margin:8px; padding:16px 24px; background:#ef4444; color:white; border:none; border-radius:12px; font-size:18px; font-weight:bold; cursor:pointer;">
-        投狗
+      <button onclick="vote('dog')" style="margin:8px;padding:16px 24px;background:#ef4444;color:white;border:none;border-radius:12px;font-size:18px;font-weight:bold;cursor:pointer;">
+        Vote Dog
       </button>
+    </div>
+
+    <!-- Simple reward message (no NFT) -->
+    <div id="rewardSection" style="display:none;margin-top:20px;">
+      <h2 style="color:#f59e0b;">3 Votes Reached!</h2>
+      <p style="font-size:16px;">Your votes have been cast on-chain!</p>
     </div>
   </div>
 
   <script>
-    // 初始票數（可改成從後端讀取）
-    let catVotes = 0;
-    let dogVotes = 0;
+    let totalVotes = 0;
 
     async function vote(choice) {
       try {
-        // 自動登入
         const { user } = await window.farcaster.signIn();
-        if (!user) return alert("登入失敗");
+        if (!user) return alert("Login failed");
 
-        // 更新票數
-        if (choice === 'cat') catVotes++;
-        else dogVotes++;
+        totalVotes++;
+        document.getElementById('totalVotes').textContent = totalVotes;
 
-        // 更新畫面
-        document.getElementById('catVotes').textContent = catVotes;
-        document.getElementById('dogVotes').textContent = dogVotes;
+        if (totalVotes >= 3) {
+          document.getElementById('rewardSection').style.display = 'block';
+        }
 
-        // 發 Cast
-        const emoji = choice === 'cat' ? '貓' : '狗';
+        const emoji = choice === 'cat' ? 'Cat' : 'Dog';
         await window.farcaster.cast(
-          `${user.displayName} 投了${emoji}！\n目前 ${catVotes} vs ${dogVotes}\n#貓狗大戰`
+          `${user.displayName} voted ${emoji}!\nVotes: ${totalVotes}/3\n#CatDogBattle`
         );
 
-        alert(`已投${emoji}！結果已發 Cast！`);
+        alert(`Voted ${emoji}! Total: ${totalVotes}`);
       } catch (e) {
-        alert("投票失敗：" + e.message);
+        alert("Vote failed: " + e.message);
       }
     }
   </script>
